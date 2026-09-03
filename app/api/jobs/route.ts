@@ -38,11 +38,11 @@ export async function GET(request: Request) {
   }
 
   const jobs = await query
-    .include("company")
-    .orderBy((job) => job.createdAt.desc())
-    .skip(offset)
-    .take(limit)
-    .all();
+  .orderBy((job) => job.createdAt.desc())
+  .limit(limit)
+  .offset(offset)
+  .include("company")
+  .all();
 
   return ok({
     items: jobs,

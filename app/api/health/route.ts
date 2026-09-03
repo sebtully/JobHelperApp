@@ -3,7 +3,7 @@ import { fail, ok } from "@/lib/api-response";
 
 export async function GET() {
   try {
-    await db.orm.public.User.take(1).all();
+    await db.orm.public.User.first();
 
     return ok({
       status: "ok",
