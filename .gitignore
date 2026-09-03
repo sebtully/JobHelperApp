@@ -5,3 +5,5 @@ node_modules
 generated
 prisma/migrations
 .DS_Store
+README.md
+
