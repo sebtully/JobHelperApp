@@ -1,4 +1,5 @@
 enum Seniority {
+  @@type("pg/text@1")
   INTERN
   JUNIOR
   MID
@@ -8,6 +9,7 @@ enum Seniority {
 }
 
 enum WorkplaceType {
+  @@type("pg/text@1")
   ONSITE
   HYBRID
   REMOTE
@@ -15,6 +17,7 @@ enum WorkplaceType {
 }
 
 enum EmploymentType {
+  @@type("pg/text@1")
   FULL_TIME
   PART_TIME
   CONTRACT
@@ -25,6 +28,7 @@ enum EmploymentType {
 }
 
 enum ApplicationStatus {
+  @@type("pg/text@1")
   SAVED
   PREPARING
   APPLIED
@@ -36,6 +40,7 @@ enum ApplicationStatus {
 }
 
 enum SkillLevel {
+  @@type("pg/text@1")
   BEGINNER
   INTERMEDIATE
   ADVANCED
@@ -44,17 +49,18 @@ enum SkillLevel {
 }
 
 enum SkillImportance {
+  @@type("pg/text@1")
   LOW
   MEDIUM
   HIGH
 }
 
 model User {
-  id        String   @id @default(cuid(2))
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String               @id @default(cuid(2))
+  email          String               @unique
+  name           String?
+  createdAt      DateTime             @default(now())
+  updatedAt      temporal.updatedAt()
 
   profile        Profile?
   userSkills     UserSkill[]
@@ -68,33 +74,33 @@ model User {
 }
 
 model Profile {
-  id     String @id @default(cuid(2))
-  userId String @unique
+  id                String               @id @default(cuid(2))
+  userId            String               @unique
 
   headline          String?
   summary           String?
   yearsOfExperience Float?
-  seniority         Seniority @default(UNKNOWN)
+  seniority         Seniority            @default(UNKNOWN)
 
-  city      String?
-  latitude  Float?
-  longitude Float?
+  city              String?
+  latitude          Float?
+  longitude         Float?
 
-  remotePreference WorkplaceType?
+  remotePreference  WorkplaceType?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime             @default(now())
+  updatedAt         temporal.updatedAt()
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
 }
 
 model Skill {
-  id             String @id @default(cuid(2))
-  name           String
-  normalizedName String @unique
+  id                  String               @id @default(cuid(2))
+  name                String
+  normalizedName      String               @unique
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt           DateTime             @default(now())
+  updatedAt           temporal.updatedAt()
 
   userSkills          UserSkill[]
   jobSkills           JobSkill[]
@@ -103,122 +109,122 @@ model Skill {
 }
 
 model UserSkill {
-  id String @id @default(cuid(2))
+  id              String     @id @default(cuid(2))
 
-  userId  String
-  skillId String
+  userId          String
+  skillId         String
 
   level           SkillLevel @default(UNKNOWN)
   yearsExperience Float?
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  user            User       @relation(fields:[userId], references:[id], onDelete: Cascade)
+  skill           Skill      @relation(fields:[skillId], references:[id], onDelete: Cascade)
 
   @@unique([userId, skillId])
 }
 
 model SearchProfile {
-  id     String @id @default(cuid(2))
-  userId String
+  id                String               @id @default(cuid(2))
+  userId            String
 
-  name String
+  name              String
 
-  jobTitles       String[]
-  keywords        String[]
-  excludeKeywords String[]
+  jobTitles         String[]
+  keywords          String[]
+  excludeKeywords   String[]
 
-  location  String?
-  latitude  Float?
-  longitude Float?
-  radiusKm  Int?
+  location          String?
+  latitude          Float?
+  longitude         Float?
+  radiusKm          Int?
 
-  seniority       Seniority[]
-  employmentTypes EmploymentType[]
-  workplaceTypes  WorkplaceType[]
+  seniority         Seniority[]
+  employmentTypes   EmploymentType[]
+  workplaceTypes    WorkplaceType[]
 
-  minimumMatchScore Int     @default(0)
-  isActive          Boolean @default(true)
+  minimumMatchScore Int                  @default(0)
+  isActive          Boolean              @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime             @default(now())
+  updatedAt         temporal.updatedAt()
 
-  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobMatches    JobMatch[]
-  includeSkills SearchProfileSkill[]
+  user              User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
+  jobMatches        JobMatch[]
+  includeSkills     SearchProfileSkill[]
 }
 
 model SearchProfileSkill {
-  id String @id @default(cuid(2))
+  id              String        @id @default(cuid(2))
 
   searchProfileId String
   skillId         String
 
-  searchProfile SearchProfile @relation(fields: [searchProfileId], references: [id], onDelete: Cascade)
-  skill         Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  searchProfile   SearchProfile @relation(fields:[searchProfileId], references:[id], onDelete: Cascade)
+  skill           Skill         @relation(fields:[skillId], references:[id], onDelete: Cascade)
 
   @@unique([searchProfileId, skillId])
 }
 
 model Company {
-  id String @id @default(cuid(2))
+  id            String               @id @default(cuid(2))
 
-  name String
-  slug String @unique
+  name          String
+  slug          String               @unique
 
   website       String?
   careerPageUrl String?
   logoUrl       String?
 
-  city    String?
-  country String?
+  city          String?
+  country       String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     temporal.updatedAt()
 
-  jobs Job[]
+  jobs          Job[]
 }
 
 model Job {
-  id String @id @default(cuid(2))
+  id              String               @id @default(cuid(2))
 
-  companyId String?
+  companyId       String?
 
-  externalId String?
-  source     String
+  externalId      String?
+  source          String
 
   title           String
   normalizedTitle String?
 
-  description  String
-  requirements String?
+  description     String
+  requirements    String?
 
-  location  String?
-  latitude  Float?
-  longitude Float?
+  location        String?
+  latitude        Float?
+  longitude       Float?
 
-  workplaceType  WorkplaceType  @default(UNKNOWN)
-  employmentType EmploymentType @default(UNKNOWN)
-  seniority      Seniority      @default(UNKNOWN)
+  workplaceType   WorkplaceType        @default(UNKNOWN)
+  employmentType  EmploymentType       @default(UNKNOWN)
+  seniority       Seniority            @default(UNKNOWN)
 
-  sourceUrl String
+  sourceUrl       String
 
-  publishedAt DateTime?
-  expiresAt   DateTime?
+  publishedAt     DateTime?
+  expiresAt       DateTime?
 
-  isActive Boolean @default(true)
-  contentHash String?
+  isActive        Boolean              @default(true)
+  contentHash     String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       temporal.updatedAt()
 
-  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  company         Company?             @relation(fields:[companyId], references:[id], onDelete: SetNull)
 
-  skills       JobSkill[]
-  matches      JobMatch[]
-  savedByUsers SavedJob[]
-  coverLetters CoverLetter[]
-  variants     ResumeVariant[]
-  applications Application[]
+  skills          JobSkill[]
+  matches         JobMatch[]
+  savedByUsers    SavedJob[]
+  coverLetters    CoverLetter[]
+  variants        ResumeVariant[]
+  applications    Application[]
 
   @@unique([source, externalId])
   @@index([title])
@@ -228,196 +234,196 @@ model Job {
 }
 
 model JobSkill {
-  id String @id @default(cuid(2))
+  id         String          @id @default(cuid(2))
 
-  jobId   String
-  skillId String
+  jobId      String
+  skillId    String
 
   importance SkillImportance @default(MEDIUM)
   required   Boolean         @default(false)
 
-  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  job        Job             @relation(fields:[jobId], references:[id], onDelete: Cascade)
+  skill      Skill           @relation(fields:[skillId], references:[id], onDelete: Cascade)
 
   @@unique([jobId, skillId])
 }
 
 model JobMatch {
-  id String @id @default(cuid(2))
+  id              String               @id @default(cuid(2))
 
   userId          String
   jobId           String
   searchProfileId String?
 
-  score Int
+  score           Int
 
-  strongMatches  Json?
-  partialMatches Json?
-  missingSkills  Json?
+  strongMatches   Json?
+  partialMatches  Json?
+  missingSkills   Json?
 
-  explanation String?
-  modelVersion String?
+  explanation     String?
+  modelVersion    String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       temporal.updatedAt()
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job           Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  searchProfile SearchProfile? @relation(fields: [searchProfileId], references: [id], onDelete: SetNull)
+  user            User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
+  job             Job                  @relation(fields:[jobId], references:[id], onDelete: Cascade)
+  searchProfile   SearchProfile?       @relation(fields:[searchProfileId], references:[id], onDelete: SetNull)
 
   @@unique([userId, jobId])
   @@index([score])
 }
 
 model SavedJob {
-  id String @id @default(cuid(2))
+  id        String   @id @default(cuid(2))
 
-  userId String
-  jobId  String
+  userId    String
+  jobId     String
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields:[userId], references:[id], onDelete: Cascade)
+  job       Job      @relation(fields:[jobId], references:[id], onDelete: Cascade)
 
   @@unique([userId, jobId])
 }
 
 model Resume {
-  id String @id @default(cuid(2))
+  id              String               @id @default(cuid(2))
 
-  userId String
-  name   String
+  userId          String
+  name            String
 
   originalFileUrl String?
   summary         String?
-  isMaster        Boolean @default(false)
+  isMaster        Boolean              @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       temporal.updatedAt()
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
 
-  experiences ResumeExperience[]
-  educations  ResumeEducation[]
-  skills      ResumeSkill[]
-  variants    ResumeVariant[]
+  experiences     ResumeExperience[]
+  educations      ResumeEducation[]
+  skills          ResumeSkill[]
+  variants        ResumeVariant[]
 }
 
 model ResumeExperience {
-  id String @id @default(cuid(2))
+  id          String    @id @default(cuid(2))
 
-  resumeId String
+  resumeId    String
 
-  company String
-  role    String
+  company     String
+  role        String
 
-  startDate DateTime?
-  endDate   DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
 
   description String?
-  sortOrder   Int @default(0)
+  sortOrder   Int       @default(0)
 
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resume      Resume    @relation(fields:[resumeId], references:[id], onDelete: Cascade)
 }
 
 model ResumeEducation {
-  id String @id @default(cuid(2))
+  id          String    @id @default(cuid(2))
 
-  resumeId String
+  resumeId    String
 
-  school String
-  degree String
+  school      String
+  degree      String
 
-  startDate DateTime?
-  endDate   DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
 
   description String?
-  sortOrder   Int @default(0)
+  sortOrder   Int       @default(0)
 
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resume      Resume    @relation(fields:[resumeId], references:[id], onDelete: Cascade)
 }
 
 model ResumeSkill {
-  id String @id @default(cuid(2))
+  id       String @id @default(cuid(2))
 
   resumeId String
   skillId  String
 
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  skill  Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  resume   Resume @relation(fields:[resumeId], references:[id], onDelete: Cascade)
+  skill    Skill  @relation(fields:[skillId], references:[id], onDelete: Cascade)
 
   @@unique([resumeId, skillId])
 }
 
 model ResumeVariant {
-  id String @id @default(cuid(2))
+  id               String               @id @default(cuid(2))
 
-  userId   String
-  resumeId String
-  jobId    String
+  userId           String
+  resumeId         String
+  jobId            String
 
-  title String
+  title            String
 
   generatedContent Json?
   editedContent    Json?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime             @default(now())
+  updatedAt        temporal.updatedAt()
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user             User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
+  resume           Resume               @relation(fields:[resumeId], references:[id], onDelete: Cascade)
+  job              Job                  @relation(fields:[jobId], references:[id], onDelete: Cascade)
 
-  applications Application[]
+  applications     Application[]
 
   @@index([userId, jobId])
 }
 
 model CoverLetter {
-  id String @id @default(cuid(2))
+  id               String               @id @default(cuid(2))
 
-  userId String
-  jobId  String
+  userId           String
+  jobId            String
 
   generatedContent String?
   editedContent    String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime             @default(now())
+  updatedAt        temporal.updatedAt()
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user             User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
+  job              Job                  @relation(fields:[jobId], references:[id], onDelete: Cascade)
 
-  applications Application[]
+  applications     Application[]
 
   @@index([userId, jobId])
 }
 
 model Application {
-  id String @id @default(cuid(2))
+  id              String               @id @default(cuid(2))
 
-  userId String
-  jobId  String
+  userId          String
+  jobId           String
 
   resumeVariantId String?
   coverLetterId   String?
 
-  status ApplicationStatus @default(SAVED)
+  status          ApplicationStatus    @default(SAVED)
 
-  appliedAt  DateTime?
-  followUpAt DateTime?
+  appliedAt       DateTime?
+  followUpAt      DateTime?
 
-  notes String?
+  notes           String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       temporal.updatedAt()
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user            User                 @relation(fields:[userId], references:[id], onDelete: Cascade)
+  job             Job                  @relation(fields:[jobId], references:[id], onDelete: Cascade)
 
-  resumeVariant ResumeVariant? @relation(fields: [resumeVariantId], references: [id], onDelete: SetNull)
-  coverLetter   CoverLetter?   @relation(fields: [coverLetterId], references: [id], onDelete: SetNull)
+  resumeVariant   ResumeVariant?       @relation(fields:[resumeVariantId], references:[id], onDelete: SetNull)
+  coverLetter     CoverLetter?         @relation(fields:[coverLetterId], references:[id], onDelete: SetNull)
 
   @@unique([userId, jobId])
   @@index([status])
